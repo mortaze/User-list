@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import axios from "axios";
+import DeleteUser from "../../components/users/Delete";
 
 const ShowUser = () => {
   const { userId } = useParams();
@@ -8,17 +10,21 @@ const ShowUser = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch(`https://jsonplaceholder.typicode.com/users/${userId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setUser(data);
-        setLoading(false);
+    const fetchUser = async () => {
+      try {
+        const response = await axios.get(
+          `https://jsonplaceholder.typicode.com/users/${userId}`
+        );
+        setUser(response.data);
         setError(null);
-      })
-      .catch((err) => {
+      } catch (err) {
         setError(err.message);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    fetchUser();
   }, [userId]);
 
   return (
@@ -36,6 +42,7 @@ const ShowUser = () => {
               <li className="list-group-item">website : {user.website}</li>
             </ul>
           </div>
+          <DeleteUser userId={user.id} />
         </div>
       )}
     </>

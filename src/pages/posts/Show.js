@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import DeletePost from "../../components/posts/Delete";
+import axios from "axios";
 
 const ShowPost = () => {
   const { postId } = useParams();
@@ -9,18 +10,21 @@ const ShowPost = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch(`https://jsonplaceholder.typicode.com/posts/${postId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setpost(data);
+
+    const fetchPost = async () => {
+      try{
+        const response = await axios.get(`https://jsonplaceholder.typicode.com/posts/${postId}`);
+        setpost(response.data);
         setLoading(false);
         setError(null);
-      })
-      .catch((err) => {
+      }catch (err) {
         setError(err.message);
         setLoading(false);
-      });
-  }, [postId]);
+
+      }
+    }
+    fetchPost();
+  }, []);
 
   return (
     <>

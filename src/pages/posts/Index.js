@@ -1,41 +1,45 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 import ListPosts from "../../components/posts/List";
 import { Link } from "react-router-dom";
-
+import axios from "axios";
 
 const IndexPost = () => {
-    const [posts, setPosts] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+  const [posts, setPosts] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-    useEffect(() => {
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await axios.get(
+          "https://jsonplaceholder.typicode.com/posts"
+        );
+        setPosts(response.data);
+        setError(null);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-        fetch("https://jsonplaceholder.typicode.com/posts")
-            .then(res => res.json())
-            .then(data => {
-                setPosts(data);
-                setLoading(false)
-                setError(null)
-            }).catch(err => {
-                setError(err.message)
-                setLoading(false)
-            })
+    fetchPosts();
+  }, []);
 
-    }, []);
+  return (
+    <>
+      <h2>Posts :</h2>
+      <div>
+        <Link className="btn btn-dark" to="/posts/create">
+          Add Post
+        </Link>
+      </div>
 
-    return (
-      <>
-               <h2>Posts :</h2>
-                <div >
-                <Link className="btn btn-dark" to ="/posts/create">Add Post</Link>
-                </div>
-                  
-               
-                {error && <div>{error}</div>}
-                {loading && <div className="spinner-border"></div>}
-                {posts && <ListPosts posts={posts} />}
-          </> 
-    )
-}
+      {error && <div>{error}</div>}
+      {loading && <div className="spinner-border"></div>}
+      {posts && <ListPosts posts={posts} />}
+    </>
+  );
+};
 
-export default IndexPost
+export default IndexPost;
